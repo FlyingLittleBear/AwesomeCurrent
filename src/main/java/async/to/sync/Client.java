@@ -4,7 +4,7 @@ import async.to.sync.response.Response;
 import async.to.sync.response.ResponseContainer;
 import async.to.sync.util.RandomUtil;
 import async.to.sync.ws.WebSocketClientManager;
-import com.alibaba.fastjson.JSONObject;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +12,7 @@ public class Client extends Thread {
 
     private static final Logger logger = LoggerFactory.getLogger(Client.class);
 
-    private static final long timeout = 5 * 1000;
+    private static final long timeout = 500;
 
     private ResponseContainer container;
 
@@ -30,12 +30,13 @@ public class Client extends Thread {
     public void run() {
         for (; ; ) {
             String id = String.valueOf(RandomUtil.getLong());
-            sendMessage(id);
-            try {
-                Thread.sleep(1000L / tps);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            String receivedId = sendMessage(id);
+            Assert.assertEquals(id, receivedId);
+//            try {
+//                Thread.sleep(1000L / tps);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
         }
     }
 
@@ -43,17 +44,11 @@ public class Client extends Thread {
         Response response = new Response();
         container.add(msgId, response);
 
-        clientManager.getWalletClient().send(makePingMessage(msgId));
+        clientManager.getWalletClient().send(msgId);
         logger.debug("Send msg! id:{},thread id:{}", msgId, Thread.currentThread().getId());
         return getResponse(msgId, response);
     }
 
-    private String makePingMessage(String msgId) {
-        JSONObject message = new JSONObject();
-        message.put("id", msgId);
-        message.put("method", "ping");
-        return message.toString();
-    }
 
     private String getResponse(String msgId, Response response) {
         String responseData = null;

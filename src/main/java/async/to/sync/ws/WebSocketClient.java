@@ -1,9 +1,6 @@
 package async.to.sync.ws;
 
 import async.to.sync.response.ResponseContainer;
-import async.to.sync.util.RandomUtil;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import org.java_websocket.handshake.ServerHandshake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,21 +43,10 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
 
     @Override
     public void onMessage(String message) {
-        try {
-            if (isTimeOut()) {
-                return;
-            }
-
-            JSONObject walletResponse = JSON.parseObject(message);
-            if (null == walletResponse) {
-                return;
-            }
-            String id = walletResponse.getString("id");
-            container.putData(id, message);
-
-        } catch (Exception e) {
-            logger.error("fail to parse result: " + message, e);
+        if (isTimeOut()) {
+            return;
         }
+        container.putData(message, message);
 
     }
 
@@ -83,6 +69,7 @@ public class WebSocketClient extends org.java_websocket.client.WebSocketClient {
 
     //mock time out
     private boolean isTimeOut() {
-        return RandomUtil.getInt() % 10 == 0;
+        //return RandomUtil.getInt() % 10 == 0;
+        return false;
     }
 }

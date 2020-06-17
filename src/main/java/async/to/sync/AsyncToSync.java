@@ -13,18 +13,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class AsyncToSync {
 
-    private static int clientNum = 500;
+    private static int clientNum = 1200;
 
-    private static int tpsPerClient = 10;
+    //没用
+    private static int tpsPerClient = 2000;
 
     @Autowired
     WebSocketClientManager webSocketClientManager;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         SpringApplication.run(AsyncToSync.class, args);
 
         ResponseContainer container = new ResponseContainer();
         WebSocketClientManager clientManager = new WebSocketClientManager(container);
+
+        Thread.sleep(3000);
 
         //Mock client
         for (int i = 0; i < clientNum; i++) {
